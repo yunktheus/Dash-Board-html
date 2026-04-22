@@ -150,7 +150,7 @@ async function openAddBibModal(defaultDay = 'geral', defaultPastaId = null) {
     const tipoOptions = [`<option value="link">🔗 Link / Site</option>`, `<option value="pdf">📄 PDF</option>`, `<option value="doc">📝 Documento</option>`, `<option value="note">🗒️ Anotação</option>`].join('');
 
     const newItem = await new Promise(resolve => {
-        modal._resolve = resolve;
+        modal.resolve = resolve;
         document.getElementById('modalTitle').textContent = 'Adicionar material';
         document.getElementById('modalSubtitle').textContent = defaultDay === 'geral' ? '' : (dayNames[defaultDay] || '');
         const iconEl = document.getElementById('modalIcon');
@@ -188,6 +188,7 @@ export function setBibFilterAndAdd(day) {
 }
 
 export function initBiblioteca() {
+    window.setBibFilterAndAdd = setBibFilterAndAdd;
     document.getElementById('bibAddBtn')?.addEventListener('click', () => openAddBibModal('geral'));
     document.getElementById('bibNewPastaBtn')?.addEventListener('click', openNewPastaModal);
     document.getElementById('bibFilters')?.addEventListener('click', e => {

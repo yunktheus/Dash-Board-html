@@ -1,4 +1,4 @@
-import { escapeHtml } from './utils.js';
+import { genId } from './utils.js';
 
 class ModalEngine {
     constructor() {
@@ -197,7 +197,10 @@ class ModalEngine {
     open() {
         this.overlay.classList.add('open');
         if (this.inputWrap.style.display !== 'none') {
-            setTimeout(() => this.input.focus(), 60);
+            setTimeout(() => {
+                const firstField = this.inputWrap.querySelector('input, textarea, select, button');
+                (firstField || this.input || this.confirmBtn)?.focus();
+            }, 60);
         } else {
             setTimeout(() => this.confirmBtn.focus(), 60);
         }

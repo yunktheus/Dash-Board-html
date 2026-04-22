@@ -20,7 +20,7 @@ function playF1RadioSound() {
     } catch (e) {}
 }
 
-function syncTimerButton(day) {
+export function syncTimerButton(day) {
     const btn = document.querySelector(`.timer-btn[data-day="${day}"]`);
     if (!btn) return;
     const state = timersState[day];

@@ -1,6 +1,6 @@
 import { modal } from './modal.js';
 import { tasksData, notes, resourcesData, bibliotecaData, saveAll, loadFromLocal, loadSavedTitle, updatePageTitle } from './storage.js';
-import { renderWeek, updateProgress } from './tasks.js';
+import { renderWeek } from './tasks.js';
 import { renderResources } from './resources.js';
 import { initBiblioteca, renderBiblioteca, updateBibBadge } from './biblioteca.js';
 import { initDashboard, renderDashboard } from './dashboard.js';

@@ -16,6 +16,7 @@ export function navigateTo(pageId) {
 }
 
 export function initNavigation() {
+    window.navigateTo = navigateTo;
     document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
         btn.addEventListener('click', () => navigateTo(btn.dataset.page));
     });
