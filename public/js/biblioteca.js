@@ -1,6 +1,7 @@
 import { escapeHtml, genId, daysOrder, dayNames } from './utils.js';
 import { modal } from './modal.js';
 import { bibliotecaData, saveAll } from './storage.js';
+import { deleteBibliotecaFile, uploadBibliotecaFile } from './file-storage.js';
 
 const TYPE_ICONS = {
     link: { icon: 'fas fa-link', cls: 'bib-item-type-link' },
@@ -14,7 +15,7 @@ const TYPE_ICONS = {
 let bibActiveFilter = 'all';
 
 function getItemMeta(item) {
-    return item.cloudNote || item.url || '—';
+    return item.originalName || item.cloudNote || item.url || '—';
 }
 
 function getItemPreview(item) {
@@ -54,6 +55,13 @@ function createItemCard(item, dayLabel, openTitle) {
             danger: true,
         });
         if (ok) {
+            if (item.storagePath) {
+                try {
+                    await deleteBibliotecaFile(item.storagePath);
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
             bibliotecaData.itens = bibliotecaData.itens.filter(i => i.id !== item.id);
             saveAll();
             renderBiblioteca();
@@ -79,7 +87,7 @@ export function renderBiblioteca() {
         : bibliotecaData.itens.filter(i => i.day === bibActiveFilter);
 
     if (bibliotecaData.pastas.length === 0) {
-        content.innerHTML = `<div class="bib-empty-cat" style="max-width:480px;margin:0 auto"><i class="fas fa-folder-plus" style="font-size:2rem;display:block;margin-bottom:10px;color:#e10600"></i><p style="font-weight:700;opacity:0.8;margin-bottom:4px">Nenhuma pasta ainda</p><p>Crie sua primeira pasta para organizar seus materiais de estudo.</p><p style="margin-top:10px;font-size:0.78rem;opacity:0.6">Você já pode salvar links públicos de PDF, imagem e arquivos como biblioteca em nuvem.</p></div>`;
+        content.innerHTML = `<div class="bib-empty-cat" style="max-width:480px;margin:0 auto"><i class="fas fa-folder-plus" style="font-size:2rem;display:block;margin-bottom:10px;color:#e10600"></i><p style="font-weight:700;opacity:0.8;margin-bottom:4px">Nenhuma pasta ainda</p><p>Crie sua primeira pasta para organizar seus materiais de estudo.</p><p style="margin-top:10px;font-size:0.78rem;opacity:0.6">Modo teste ativo: uploads autenticados com limite de 20 MB por arquivo.</p></div>`;
         return;
     }
 
@@ -193,6 +201,7 @@ async function openAddBibModal(defaultDay = 'geral', defaultPastaId = null) {
             <div class="bib-modal-fields">
                 <div><div class="bib-field-label">Título *</div><input type="text" class="modal-input" id="_bibTitulo" maxlength="100" placeholder="Ex: Curso de JavaScript" autocomplete="off"></div>
                 <div><div class="bib-field-label">URL / Link (opcional)</div><input type="url" class="modal-input" id="_bibUrl" placeholder="https://..." autocomplete="off"></div>
+                <div><div class="bib-field-label">Arquivo (modo teste, até 20 MB)</div><input type="file" class="modal-input" id="_bibFile" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.txt,image/*,application/pdf,.doc,.docx,.txt"></div>
                 <div><div class="bib-field-label">Origem em nuvem (opcional)</div><input type="text" class="modal-input" id="_bibCloudNote" maxlength="120" placeholder="Ex: Drive, link público, pasta compartilhada"></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div class="bib-field-label">Tipo</div><select class="bib-select" id="_bibTipo">${tipoOptions}</select></div><div><div class="bib-field-label">Pasta</div><select class="bib-select" id="_bibPasta">${pastaOptions}</select></div></div>
                 <div><div class="bib-field-label">Dia de referência</div><select class="bib-select" id="_bibDay">${dayOptions}</select></div>
@@ -204,6 +213,23 @@ async function openAddBibModal(defaultDay = 'geral', defaultPastaId = null) {
     });
 
     if (newItem) {
+        if (newItem.localFile) {
+            try {
+                const upload = await uploadBibliotecaFile(newItem.localFile);
+                Object.assign(newItem, upload);
+            } catch (error) {
+                await modal.confirmDialog({
+                    title: 'Upload não concluído',
+                    body: error.message || 'Não foi possível enviar o arquivo.',
+                    icon: 'fas fa-triangle-exclamation',
+                    confirmLabel: 'Fechar',
+                    danger: true,
+                    iconVariant: 'warning',
+                });
+                return;
+            }
+            delete newItem.localFile;
+        }
         bibliotecaData.itens.push(newItem);
         saveAll();
         renderBiblioteca();

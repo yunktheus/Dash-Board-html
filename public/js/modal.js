@@ -219,6 +219,7 @@ class ModalEngine {
             this.bibMode = false;
             const titulo = document.getElementById('_bibTitulo')?.value.trim() || '';
             const url = document.getElementById('_bibUrl')?.value.trim() || '';
+            const localFile = document.getElementById('_bibFile')?.files?.[0] || null;
             const cloudNote = document.getElementById('_bibCloudNote')?.value.trim() || '';
             const tipo = document.getElementById('_bibTipo')?.value || 'link';
             const pastaId = document.getElementById('_bibPasta')?.value || '';
@@ -227,7 +228,7 @@ class ModalEngine {
             if (!titulo) { this.close(null); return; }
             const newItem = {
                 id: genId(),
-                titulo, url, cloudNote, tipo, pastaId, day,
+                titulo, url, cloudNote, tipo, pastaId, day, localFile,
                 addedAt: new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' }),
             };
             this.close(newItem);

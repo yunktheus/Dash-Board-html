@@ -49,6 +49,14 @@
             border: 1px solid rgba(255,255,255,0.08);
             background: rgba(12, 18, 30, 0.92);
             box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+            text-align: center;
+        }
+
+        .auth-gate-brand {
+            font-size: clamp(2.2rem, 6vw, 3.8rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin-bottom: 10px;
         }
 
         .auth-gate-badge {
@@ -67,29 +75,31 @@
         .auth-gate-title {
             font-size: clamp(2rem, 4vw, 2.7rem);
             line-height: 1;
-            margin-bottom: 14px;
-            max-width: 10ch;
+            margin: 0 auto 14px;
+            max-width: 11ch;
         }
 
         .auth-gate-text {
             opacity: 0.72;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
             max-width: 46ch;
         }
 
-        .auth-gate-points {
-            display: grid;
-            gap: 10px;
-            margin-bottom: 24px;
-            font-size: 0.92rem;
+        .google-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            font-weight: 900;
+            font-size: 1.05rem;
         }
 
-        .auth-gate-points div {
-            padding: 12px 14px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.05);
+        .g-blue {
+            color: #4285f4;
         }
 
         .auth-gate-btn {
@@ -99,10 +109,11 @@
             border-radius: 16px;
             background: #ffffff !important;
             color: #111827 !important;
-            border: none !important;
+            border: 1px solid #d9dce3 !important;
             font-weight: 800 !important;
             font-size: 0.95rem !important;
             margin-bottom: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
         }
 
         .auth-gate-btn:disabled {
@@ -1605,6 +1616,10 @@
             border-radius: 14px;
             margin-top: 10px;
             display: block;
+        }
+
+        input[type="file"].modal-input {
+            padding: 10px 12px;
         }
 
         .bib-item-title {

@@ -15,6 +15,10 @@ function getConfig() {
     return window.__POMODASH_FIREBASE__ || { enabled: false };
 }
 
+function gateGoogleButtonContent(label) {
+    return '<span class="google-mark" aria-hidden="true"><span class="g-blue">G</span></span><span>' + label + '</span>';
+}
+
 function setAuthGateVisible(visible) {
     document.body.classList.toggle('auth-locked', visible);
 }
@@ -39,7 +43,7 @@ function updateAuthUI(user) {
         btn.innerHTML = '<span class="nav-item-icon"><i class="fab fa-google" aria-hidden="true"></i></span><span>Entrar com Google</span>';
         btn.setAttribute('aria-label', 'Entrar com Google');
         gateStatus.textContent = 'Entre com Google para liberar o painel.';
-        gateBtn.innerHTML = '<i class="fab fa-google" aria-hidden="true"></i><span>Entrar com Google</span>';
+        gateBtn.innerHTML = gateGoogleButtonContent('Entrar com Google');
         gateBtn.disabled = false;
         setAuthGateVisible(true);
     }
