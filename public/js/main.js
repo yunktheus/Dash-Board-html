@@ -6,6 +6,7 @@ import { initBiblioteca, renderBiblioteca, updateBibBadge } from './biblioteca.j
 import { initDashboard, renderDashboard } from './dashboard.js';
 import { initNavigation } from './navigation.js';
 import { initTimerSystem } from './timer.js';
+import { initCloudSync } from './cloud.js';
 
 function exportData() {
     const customTitle = document.getElementById('editableTitle').value;
@@ -87,6 +88,14 @@ function registerServiceWorker() {
     });
 }
 
+function rerenderApp() {
+    renderWeek();
+    renderResources();
+    renderBiblioteca();
+    renderDashboard();
+    updateBibBadge();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     modal.init();
     registerServiceWorker();
@@ -107,4 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.files.length) importData(e.target.files[0]);
         e.target.value = '';
     });
+
+    initCloudSync({ rerender: rerenderApp }).catch(error => console.warn(error));
 });

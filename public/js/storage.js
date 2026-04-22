@@ -30,9 +30,22 @@ export let bibliotecaData = { pastas: [], itens: [] };
 
 const STORAGE_KEY = 'estudosF1_data';
 const TITLE_KEY = 'estudosF1_customTitle';
+const stateListeners = new Set();
 
-export function saveAll() {
+function emitStateChange() {
+    const snapshot = getSerializableAppState();
+    stateListeners.forEach(listener => {
+        try {
+            listener(snapshot);
+        } catch (e) {
+            console.warn(e);
+        }
+    });
+}
+
+export function saveAll(options = {}) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasksData, notes, resourcesData, bibliotecaData }));
+    if (!options.silent) emitStateChange();
 }
 
 export function loadFromLocal() {
@@ -74,4 +87,45 @@ export function loadSavedTitle() {
 export function updatePageTitle(newTitle) {
     document.title = newTitle;
     localStorage.setItem(TITLE_KEY, newTitle);
+    emitStateChange();
+}
+
+export function getSerializableAppState() {
+    return {
+        tasksData: JSON.parse(JSON.stringify(tasksData)),
+        notes: JSON.parse(JSON.stringify(notes)),
+        resourcesData: JSON.parse(JSON.stringify(resourcesData)),
+        bibliotecaData: JSON.parse(JSON.stringify(bibliotecaData)),
+        customTitle: localStorage.getItem(TITLE_KEY) || 'PomoDash',
+    };
+}
+
+export function applySerializableAppState(data = {}) {
+    if (data.tasksData) tasksData = data.tasksData;
+    if (data.notes) notes = data.notes;
+    if (data.resourcesData) resourcesData = data.resourcesData;
+    if (data.bibliotecaData) {
+        bibliotecaData = data.bibliotecaData;
+        if (!Array.isArray(bibliotecaData.pastas)) bibliotecaData.pastas = [];
+        if (!Array.isArray(bibliotecaData.itens)) bibliotecaData.itens = [];
+    }
+
+    for (const day of daysOrder) {
+        if (!Array.isArray(tasksData[day])) tasksData[day] = [];
+        if (!Array.isArray(notes[day])) notes[day] = [];
+    }
+
+    if (data.customTitle) {
+        const titleInput = document.getElementById('editableTitle');
+        if (titleInput) titleInput.value = data.customTitle;
+        document.title = data.customTitle;
+        localStorage.setItem(TITLE_KEY, data.customTitle);
+    }
+
+    saveAll({ silent: true });
+}
+
+export function onAppStateChange(listener) {
+    stateListeners.add(listener);
+    return () => stateListeners.delete(listener);
 }

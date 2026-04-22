@@ -948,6 +948,36 @@
         body.dark .sidebar-bottom  { border-color: #1e2a40; }
         body.light .sidebar-bottom { border-color: #dce3ec; }
 
+        .cloud-status {
+            font-size: 0.72rem;
+            border-radius: 999px;
+            padding: 8px 10px;
+            margin: 0 6px 8px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .cloud-status[data-tone="idle"] {
+            background: rgba(148,163,184,0.12);
+            color: #94a3b8;
+        }
+
+        .cloud-status[data-tone="loading"] {
+            background: rgba(245,158,11,0.12);
+            color: #f59e0b;
+        }
+
+        .cloud-status[data-tone="ready"] {
+            background: rgba(16,185,129,0.12);
+            color: #10b981;
+        }
+
+        .cloud-status[data-tone="error"] {
+            background: rgba(239,68,68,0.12);
+            color: #ef4444;
+        }
+
         /* ── Main area ── */
         .main-area {
             flex: 1;
@@ -1456,6 +1486,15 @@
         .bib-item-type-note { background: rgba(16,185,129,0.12); color: #10b981; }
 
         .bib-item-info { flex: 1; min-width: 0; }
+
+        .bib-item-preview {
+            width: 100%;
+            max-height: 160px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-top: 10px;
+            display: block;
+        }
 
         .bib-item-title {
             font-size: 0.87rem;

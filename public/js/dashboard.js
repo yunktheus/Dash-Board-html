@@ -2,6 +2,18 @@ import { modal } from './modal.js';
 
 let frequenciaData = { registros: [] };
 const FREQ_KEY = 'pomodash_frequencia';
+const frequenciaListeners = new Set();
+
+function emitFrequenciaChange() {
+    const snapshot = getFrequenciaData();
+    frequenciaListeners.forEach(listener => {
+        try {
+            listener(snapshot);
+        } catch (e) {
+            console.warn(e);
+        }
+    });
+}
 
 function todayStr() {
     return new Date().toISOString().slice(0, 10);
@@ -9,6 +21,7 @@ function todayStr() {
 
 function saveFrequencia() {
     localStorage.setItem(FREQ_KEY, JSON.stringify(frequenciaData));
+    emitFrequenciaChange();
 }
 
 export function loadFrequencia() {
@@ -171,4 +184,20 @@ export function initDashboard() {
         modal.confirmDialog({ title: 'Presença registrada! ✅', body: 'Ótimo, mais um dia de estudos registrado. Continue assim!', icon: 'fas fa-calendar-check', confirmLabel: 'Valeu!', iconVariant: 'success' });
     });
     renderDashboard();
+}
+
+export function getFrequenciaData() {
+    return { registros: [...frequenciaData.registros] };
+}
+
+export function applyFrequenciaData(data = {}) {
+    frequenciaData = {
+        registros: Array.isArray(data.registros) ? [...data.registros] : [],
+    };
+    localStorage.setItem(FREQ_KEY, JSON.stringify(frequenciaData));
+}
+
+export function onFrequenciaChange(listener) {
+    frequenciaListeners.add(listener);
+    return () => frequenciaListeners.delete(listener);
 }

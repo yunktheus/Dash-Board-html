@@ -4,12 +4,65 @@ import { bibliotecaData, saveAll } from './storage.js';
 
 const TYPE_ICONS = {
     link: { icon: 'fas fa-link', cls: 'bib-item-type-link' },
-    pdf:  { icon: 'fas fa-file-pdf', cls: 'bib-item-type-pdf' },
-    doc:  { icon: 'fas fa-file-lines', cls: 'bib-item-type-doc' },
+    pdf: { icon: 'fas fa-file-pdf', cls: 'bib-item-type-pdf' },
+    doc: { icon: 'fas fa-file-lines', cls: 'bib-item-type-doc' },
     note: { icon: 'fas fa-sticky-note', cls: 'bib-item-type-note' },
+    image: { icon: 'fas fa-image', cls: 'bib-item-type-note' },
+    file: { icon: 'fas fa-paperclip', cls: 'bib-item-type-doc' },
 };
 
 let bibActiveFilter = 'all';
+
+function getItemMeta(item) {
+    return item.cloudNote || item.url || '—';
+}
+
+function getItemPreview(item) {
+    if (item.tipo !== 'image' || !item.url) return '';
+    return `<img class="bib-item-preview" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.titulo)}">`;
+}
+
+function createItemCard(item, dayLabel, openTitle) {
+    const ti = TYPE_ICONS[item.tipo] || TYPE_ICONS.link;
+    const metaText = getItemMeta(item);
+    const preview = getItemPreview(item);
+    const div = document.createElement('div');
+    div.className = 'bib-item';
+    div.innerHTML = `
+        <div class="bib-item-type-icon ${ti.cls}"><i class="${ti.icon}"></i></div>
+        <div class="bib-item-info">
+            <div class="bib-item-title">${escapeHtml(item.titulo)}</div>
+            <div class="bib-item-meta">${escapeHtml(metaText)} · ${escapeHtml(item.addedAt || '')}</div>
+            ${preview}
+        </div>
+        <span class="bib-item-day-tag">${escapeHtml(dayLabel)}</span>
+        <div class="bib-item-actions">
+            ${item.url ? `<button class="bib-item-action-btn bib-item-open-btn" title="${openTitle}"><i class="fas fa-arrow-up-right-from-square"></i></button>` : ''}
+            <button class="bib-item-action-btn bib-delete-btn" data-id="${escapeHtml(item.id)}" title="Remover"><i class="fas fa-trash"></i></button>
+        </div>
+    `;
+
+    if (item.url) {
+        div.querySelector('.bib-item-open-btn')?.addEventListener('click', () => window.open(item.url, '_blank'));
+    }
+
+    div.querySelector('.bib-delete-btn')?.addEventListener('click', async () => {
+        const ok = await modal.confirmDialog({
+            title: 'Remover material?',
+            body: `"${item.titulo}"`,
+            confirmLabel: 'Remover',
+            danger: true,
+        });
+        if (ok) {
+            bibliotecaData.itens = bibliotecaData.itens.filter(i => i.id !== item.id);
+            saveAll();
+            renderBiblioteca();
+            updateBibBadge();
+        }
+    });
+
+    return div;
+}
 
 export function updateBibBadge() {
     const badge = document.getElementById('badgeBiblioteca');
@@ -26,7 +79,7 @@ export function renderBiblioteca() {
         : bibliotecaData.itens.filter(i => i.day === bibActiveFilter);
 
     if (bibliotecaData.pastas.length === 0) {
-        content.innerHTML = `<div class="bib-empty-cat" style="max-width:480px;margin:0 auto"><i class="fas fa-folder-plus" style="font-size:2rem;display:block;margin-bottom:10px;color:#e10600"></i><p style="font-weight:700;opacity:0.8;margin-bottom:4px">Nenhuma pasta ainda</p><p>Crie sua primeira pasta para organizar seus materiais de estudo.</p></div>`;
+        content.innerHTML = `<div class="bib-empty-cat" style="max-width:480px;margin:0 auto"><i class="fas fa-folder-plus" style="font-size:2rem;display:block;margin-bottom:10px;color:#e10600"></i><p style="font-weight:700;opacity:0.8;margin-bottom:4px">Nenhuma pasta ainda</p><p>Crie sua primeira pasta para organizar seus materiais de estudo.</p><p style="margin-top:10px;font-size:0.78rem;opacity:0.6">Você já pode salvar links públicos de PDF, imagem e arquivos como biblioteca em nuvem.</p></div>`;
         return;
     }
 
@@ -49,46 +102,33 @@ export function renderBiblioteca() {
         `;
         content.appendChild(section);
         const grid = section.querySelector(`.bib-items-grid`);
+
         if (pastaItens.length === 0) {
             grid.innerHTML = `<div class="bib-empty-cat" style="padding:14px">Pasta vazia · clique em <i class="fas fa-plus"></i> para adicionar</div>`;
         } else {
             pastaItens.forEach(item => {
-                const ti = TYPE_ICONS[item.tipo] || TYPE_ICONS.link;
                 const dayLabel = item.day === 'geral' ? 'Geral' : (dayNames[item.day] || item.day);
-                const div = document.createElement('div');
-                div.className = 'bib-item';
-                div.innerHTML = `
-                    <div class="bib-item-type-icon ${ti.cls}"><i class="${ti.icon}"></i></div>
-                    <div class="bib-item-info"><div class="bib-item-title">${escapeHtml(item.titulo)}</div><div class="bib-item-meta">${escapeHtml(item.url || '—')} · ${escapeHtml(item.addedAt || '')}</div></div>
-                    <span class="bib-item-day-tag">${escapeHtml(dayLabel)}</span>
-                    <div class="bib-item-actions">
-                        ${item.url ? `<button class="bib-item-action-btn bib-item-open-btn" title="Abrir link"><i class="fas fa-arrow-up-right-from-square"></i></button>` : ''}
-                        <button class="bib-item-action-btn bib-delete-btn" data-id="${escapeHtml(item.id)}" title="Remover"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                if (item.url) div.querySelector('.bib-item-open-btn').addEventListener('click', () => window.open(item.url, '_blank'));
-                div.querySelector('.bib-delete-btn').addEventListener('click', async () => {
-                    const ok = await modal.confirmDialog({ title: 'Remover material?', body: `"${item.titulo}"`, confirmLabel: 'Remover', danger: true });
-                    if (ok) {
-                        bibliotecaData.itens = bibliotecaData.itens.filter(i => i.id !== item.id);
-                        saveAll();
-                        renderBiblioteca();
-                        updateBibBadge();
-                    }
-                });
-                grid.appendChild(div);
+                grid.appendChild(createItemCard(item, dayLabel, 'Abrir link'));
             });
         }
 
-        // Eventos da pasta
-        section.querySelector('.bib-pasta-add-btn').addEventListener('click', () => openAddBibModal('geral', pasta.id));
-        section.querySelector('.bib-pasta-rename-btn').addEventListener('click', async () => {
+        section.querySelector('.bib-pasta-add-btn')?.addEventListener('click', () => openAddBibModal('geral', pasta.id));
+        section.querySelector('.bib-pasta-rename-btn')?.addEventListener('click', async () => {
             const newName = await modal.prompt({ title: 'Renomear pasta', value: pasta.nome, icon: 'fas fa-folder', confirmLabel: 'Renomear' });
-            if (newName) { pasta.nome = newName; saveAll(); renderBiblioteca(); }
+            if (newName) {
+                pasta.nome = newName;
+                saveAll();
+                renderBiblioteca();
+            }
         });
-        section.querySelector('[data-pasta-del]').addEventListener('click', async () => {
+        section.querySelector('[data-pasta-del]')?.addEventListener('click', async () => {
             const count = bibliotecaData.itens.filter(i => i.pastaId === pasta.id).length;
-            const ok = await modal.confirmDialog({ title: 'Excluir pasta?', body: count > 0 ? `A pasta "${pasta.nome}" tem ${count} item(s). Todos serão removidos.` : `A pasta "${pasta.nome}" será excluída.`, confirmLabel: 'Excluir', danger: true });
+            const ok = await modal.confirmDialog({
+                title: 'Excluir pasta?',
+                body: count > 0 ? `A pasta "${pasta.nome}" tem ${count} item(s). Todos serão removidos.` : `A pasta "${pasta.nome}" será excluída.`,
+                confirmLabel: 'Excluir',
+                danger: true,
+            });
             if (ok) {
                 bibliotecaData.itens = bibliotecaData.itens.filter(i => i.pastaId !== pasta.id);
                 bibliotecaData.pastas = bibliotecaData.pastas.filter(p => p.id !== pasta.id);
@@ -99,34 +139,16 @@ export function renderBiblioteca() {
         });
     });
 
-    // Itens sem pasta
     const semPasta = itensVisiveis.filter(i => !bibliotecaData.pastas.find(p => p.id === i.pastaId));
     if (semPasta.length > 0) {
         const section = document.createElement('div');
         section.className = 'bib-category';
         section.innerHTML = `<div class="bib-category-header"><div class="bib-category-icon" style="background:rgba(148,163,184,0.15);color:#94a3b8"><i class="fas fa-folder-open"></i></div><span class="bib-category-title">Sem pasta</span><span class="bib-category-count">${semPasta.length}</span></div><div class="bib-items-grid" id="bib-grid-nopasta"></div>`;
         content.appendChild(section);
-        const grid = document.getElementById('bib-grid-nopasta');
+        const grid = section.querySelector('#bib-grid-nopasta');
         semPasta.forEach(item => {
-            const ti = TYPE_ICONS[item.tipo] || TYPE_ICONS.link;
             const dayLabel = item.day === 'geral' ? 'Geral' : (dayNames[item.day] || item.day);
-            const div = document.createElement('div');
-            div.className = 'bib-item';
-            div.innerHTML = `
-                <div class="bib-item-type-icon ${ti.cls}"><i class="${ti.icon}"></i></div>
-                <div class="bib-item-info"><div class="bib-item-title">${escapeHtml(item.titulo)}</div><div class="bib-item-meta">${escapeHtml(item.url || '—')} · ${escapeHtml(item.addedAt || '')}</div></div>
-                <span class="bib-item-day-tag">${escapeHtml(dayLabel)}</span>
-                <div class="bib-item-actions">
-                    ${item.url ? `<button class="bib-item-action-btn bib-item-open-btn" title="Abrir"><i class="fas fa-arrow-up-right-from-square"></i></button>` : ''}
-                    <button class="bib-item-action-btn bib-delete-btn" data-id="${item.id}" title="Remover"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            if (item.url) div.querySelector('.bib-item-open-btn').addEventListener('click', () => window.open(item.url, '_blank'));
-            div.querySelector('.bib-delete-btn').addEventListener('click', async () => {
-                const ok = await modal.confirmDialog({ title: 'Remover material?', body: `"${item.titulo}"`, confirmLabel: 'Remover', danger: true });
-                if (ok) { bibliotecaData.itens = bibliotecaData.itens.filter(i => i.id !== item.id); saveAll(); renderBiblioteca(); updateBibBadge(); }
-            });
-            grid.appendChild(div);
+            grid.appendChild(createItemCard(item, dayLabel, 'Abrir'));
         });
     }
 }
@@ -147,7 +169,14 @@ async function openAddBibModal(defaultDay = 'geral', defaultPastaId = null) {
         ? [`<option value="">— Sem pasta —</option>`, ...bibliotecaData.pastas.map(p => `<option value="${p.id}"${p.id === defaultPastaId ? ' selected' : ''}>${escapeHtml(p.nome)}</option>`)].join('')
         : '<option value="">Nenhuma pasta criada ainda</option>';
     const dayOptions = [`<option value="geral">Geral</option>`, ...daysOrder.map(d => `<option value="${d}"${d === defaultDay ? ' selected' : ''}>${dayNames[d]}</option>`)].join('');
-    const tipoOptions = [`<option value="link">🔗 Link / Site</option>`, `<option value="pdf">📄 PDF</option>`, `<option value="doc">📝 Documento</option>`, `<option value="note">🗒️ Anotação</option>`].join('');
+    const tipoOptions = [
+        '<option value="link">🔗 Link / Site</option>',
+        '<option value="pdf">📄 PDF</option>',
+        '<option value="doc">📝 Documento</option>',
+        '<option value="note">🗒️ Anotação</option>',
+        '<option value="image">🖼️ Imagem</option>',
+        '<option value="file">📎 Arquivo</option>',
+    ].join('');
 
     const newItem = await new Promise(resolve => {
         modal.resolve = resolve;
@@ -164,6 +193,7 @@ async function openAddBibModal(defaultDay = 'geral', defaultPastaId = null) {
             <div class="bib-modal-fields">
                 <div><div class="bib-field-label">Título *</div><input type="text" class="modal-input" id="_bibTitulo" maxlength="100" placeholder="Ex: Curso de JavaScript" autocomplete="off"></div>
                 <div><div class="bib-field-label">URL / Link (opcional)</div><input type="url" class="modal-input" id="_bibUrl" placeholder="https://..." autocomplete="off"></div>
+                <div><div class="bib-field-label">Origem em nuvem (opcional)</div><input type="text" class="modal-input" id="_bibCloudNote" maxlength="120" placeholder="Ex: Drive, link público, pasta compartilhada"></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div class="bib-field-label">Tipo</div><select class="bib-select" id="_bibTipo">${tipoOptions}</select></div><div><div class="bib-field-label">Pasta</div><select class="bib-select" id="_bibPasta">${pastaOptions}</select></div></div>
                 <div><div class="bib-field-label">Dia de referência</div><select class="bib-select" id="_bibDay">${dayOptions}</select></div>
             </div>
