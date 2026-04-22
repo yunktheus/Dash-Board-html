@@ -7,6 +7,7 @@ import { initDashboard, renderDashboard } from './dashboard.js';
 import { initNavigation } from './navigation.js';
 import { initTimerSystem } from './timer.js';
 import { initCloudSync } from './cloud.js';
+import { initAuth } from './auth.js';
 
 function exportData() {
     const customTitle = document.getElementById('editableTitle').value;
@@ -99,6 +100,7 @@ function rerenderApp() {
 document.addEventListener('DOMContentLoaded', () => {
     modal.init();
     registerServiceWorker();
+    initAuth().catch(error => console.warn(error));
     initTheme();
     loadSavedTitle();
     setupEditableTitle();

@@ -978,6 +978,21 @@
             color: #ef4444;
         }
 
+        .auth-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .auth-status {
+            font-size: 0.72rem;
+            opacity: 0.7;
+            padding: 0 6px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
         /* ── Main area ── */
         .main-area {
             flex: 1;

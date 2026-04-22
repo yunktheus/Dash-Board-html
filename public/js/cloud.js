@@ -17,20 +17,21 @@ import {
     getFrequenciaData,
     onFrequenciaChange,
 } from './dashboard.js';
+import { getCurrentUser, onUserChanged } from './auth.js';
 
 let suppressSync = false;
 let syncTimer = null;
+let unsubscribeSnapshot = null;
+let unsubscribeState = null;
+let unsubscribeFrequencia = null;
 
 function getCloudConfig() {
     return window.__POMODASH_FIREBASE__ || { enabled: false };
 }
 
-function getWorkspaceId(config) {
+function getWorkspaceId(config, user) {
     const fromUrl = new URLSearchParams(window.location.search).get('workspace');
-    const fromStorage = localStorage.getItem('pomodash_workspace_id');
-    const workspaceId = fromUrl || fromStorage || config.workspaceId || 'default';
-    localStorage.setItem('pomodash_workspace_id', workspaceId);
-    return workspaceId;
+    return fromUrl || config.workspaceId || user.uid;
 }
 
 function updateCloudStatus(label, tone = 'idle') {
@@ -67,50 +68,64 @@ export async function initCloudSync({ rerender }) {
         return;
     }
 
-    const workspaceId = getWorkspaceId(config);
-    const app = initializeApp(config.firebase);
+    const app = initializeApp(config.firebase, 'cloud-sync');
     const db = getFirestore(app);
-    const ref = doc(db, 'workspaces', workspaceId);
 
-    updateCloudStatus(`Nuvem: ${workspaceId}`, 'loading');
+    const connectForUser = async user => {
+        if (unsubscribeSnapshot) unsubscribeSnapshot();
+        if (unsubscribeState) unsubscribeState();
+        if (unsubscribeFrequencia) unsubscribeFrequencia();
 
-    const pushState = () => {
-        if (suppressSync) return;
-        clearTimeout(syncTimer);
-        syncTimer = setTimeout(async () => {
-            try {
-                updateCloudStatus(`Sincronizando: ${workspaceId}`, 'loading');
-                await setDoc(ref, buildCloudPayload(workspaceId), { merge: true });
-                updateCloudStatus(`Nuvem: ${workspaceId}`, 'ready');
-            } catch (e) {
-                console.warn(e);
+        if (!user) {
+            updateCloudStatus('Faça login para sincronizar', 'idle');
+            return;
+        }
+
+        const workspaceId = getWorkspaceId(config, user);
+        const ref = doc(db, 'workspaces', workspaceId);
+        updateCloudStatus(`Nuvem: ${user.email || workspaceId}`, 'loading');
+
+        const pushState = () => {
+            if (suppressSync) return;
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(async () => {
+                try {
+                    updateCloudStatus(`Sincronizando: ${user.email || workspaceId}`, 'loading');
+                    await setDoc(ref, buildCloudPayload(workspaceId), { merge: true });
+                    updateCloudStatus(`Nuvem: ${user.email || workspaceId}`, 'ready');
+                } catch (e) {
+                    console.warn(e);
+                    updateCloudStatus('Erro na nuvem', 'error');
+                }
+            }, 500);
+        };
+
+        unsubscribeState = onAppStateChange(pushState);
+        unsubscribeFrequencia = onFrequenciaChange(pushState);
+
+        const existing = await getDoc(ref);
+        if (!existing.exists()) {
+            await setDoc(ref, buildCloudPayload(workspaceId), { merge: true });
+            updateCloudStatus(`Nuvem: ${user.email || workspaceId}`, 'ready');
+        } else {
+            applyRemotePayload(existing.data(), rerender);
+            updateCloudStatus(`Nuvem: ${user.email || workspaceId}`, 'ready');
+        }
+
+        unsubscribeSnapshot = onSnapshot(
+            ref,
+            snapshot => {
+                if (!snapshot.exists() || suppressSync) return;
+                applyRemotePayload(snapshot.data(), rerender);
+                updateCloudStatus(`Nuvem: ${user.email || workspaceId}`, 'ready');
+            },
+            error => {
+                console.warn(error);
                 updateCloudStatus('Erro na nuvem', 'error');
-            }
-        }, 500);
+            },
+        );
     };
 
-    onAppStateChange(pushState);
-    onFrequenciaChange(pushState);
-
-    const existing = await getDoc(ref);
-    if (!existing.exists()) {
-        await setDoc(ref, buildCloudPayload(workspaceId), { merge: true });
-        updateCloudStatus(`Nuvem: ${workspaceId}`, 'ready');
-    } else {
-        applyRemotePayload(existing.data(), rerender);
-        updateCloudStatus(`Nuvem: ${workspaceId}`, 'ready');
-    }
-
-    onSnapshot(
-        ref,
-        snapshot => {
-            if (!snapshot.exists() || suppressSync) return;
-            applyRemotePayload(snapshot.data(), rerender);
-            updateCloudStatus(`Nuvem: ${workspaceId}`, 'ready');
-        },
-        error => {
-            console.warn(error);
-            updateCloudStatus('Erro na nuvem', 'error');
-        },
-    );
+    await connectForUser(getCurrentUser());
+    onUserChanged(connectForUser);
 }
