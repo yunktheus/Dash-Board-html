@@ -15,19 +15,33 @@ function getConfig() {
     return window.__POMODASH_FIREBASE__ || { enabled: false };
 }
 
+function setAuthGateVisible(visible) {
+    document.body.classList.toggle('auth-locked', visible);
+}
+
 function updateAuthUI(user) {
     const statusEl = document.getElementById('authStatus');
     const btn = document.getElementById('authToggleBtn');
-    if (!statusEl || !btn) return;
+    const gateStatus = document.getElementById('authGateStatus');
+    const gateBtn = document.getElementById('authGateBtn');
+    if (!statusEl || !btn || !gateStatus || !gateBtn) return;
 
     if (user) {
         statusEl.textContent = user.displayName || user.email || 'Conectado';
         btn.innerHTML = '<span class="nav-item-icon"><i class="fas fa-right-from-bracket" aria-hidden="true"></i></span><span>Sair</span>';
         btn.setAttribute('aria-label', 'Sair da conta');
+        gateStatus.textContent = `Conectado como ${user.displayName || user.email || 'usuário'}`;
+        gateBtn.innerHTML = '<i class="fas fa-circle-check" aria-hidden="true"></i><span>Acesso liberado</span>';
+        gateBtn.disabled = true;
+        setAuthGateVisible(false);
     } else {
         statusEl.textContent = 'Login necessário';
         btn.innerHTML = '<span class="nav-item-icon"><i class="fab fa-google" aria-hidden="true"></i></span><span>Entrar com Google</span>';
         btn.setAttribute('aria-label', 'Entrar com Google');
+        gateStatus.textContent = 'Entre com Google para liberar o painel.';
+        gateBtn.innerHTML = '<i class="fab fa-google" aria-hidden="true"></i><span>Entrar com Google</span>';
+        gateBtn.disabled = false;
+        setAuthGateVisible(true);
     }
 }
 
@@ -52,9 +66,12 @@ export function onUserChanged(listener) {
 
 export async function initAuth() {
     const config = getConfig();
+    setAuthGateVisible(true);
     updateAuthUI(null);
 
     if (!config.enabled || !config.firebase) {
+        const gateStatus = document.getElementById('authGateStatus');
+        if (gateStatus) gateStatus.textContent = 'Firebase ainda não configurado para autenticação.';
         return null;
     }
 
@@ -63,7 +80,7 @@ export async function initAuth() {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    document.getElementById('authToggleBtn')?.addEventListener('click', async () => {
+    const handleAuthAction = async () => {
         try {
             if (authInstance.currentUser) {
                 await signOut(authInstance);
@@ -72,8 +89,15 @@ export async function initAuth() {
             await signInWithPopup(authInstance, provider);
         } catch (error) {
             console.warn(error);
+            const gateStatus = document.getElementById('authGateStatus');
+            if (gateStatus) {
+                gateStatus.textContent = 'Não foi possível entrar agora. Verifique o provedor Google e o domínio autorizado.';
+            }
         }
-    });
+    };
+
+    document.getElementById('authToggleBtn')?.addEventListener('click', handleAuthAction);
+    document.getElementById('authGateBtn')?.addEventListener('click', handleAuthAction);
 
     return new Promise(resolve => {
         onAuthStateChanged(authInstance, user => {
