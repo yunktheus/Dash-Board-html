@@ -115,6 +115,32 @@
 
         body.light .progress-bar-container { background: #e2e8f0; }
 
+        .shortcut-hint {
+            font-size: 0.76rem;
+            opacity: 0.55;
+            margin: -8px 0 18px;
+        }
+
+        kbd {
+            border-radius: 8px;
+            padding: 3px 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: inherit;
+        }
+
+        body.dark kbd {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #eef2ff;
+        }
+
+        body.light kbd {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+        }
+
         .progress-fill {
             background: #e10600;
             width: 0%;
@@ -783,6 +809,8 @@
             .day-card { min-width: 300px; }
             .editable-title { font-size: 1.2rem; }
             .title-container i { font-size: 1.3rem; }
+            .container { padding: 18px 14px 90px; }
+            .shortcut-hint { margin-bottom: 14px; }
         }
 
         /* ══════════════════════════════════
@@ -1088,14 +1116,154 @@
         .biblioteca-empty i { font-size: 2rem; }
         .biblioteca-empty p { font-size: 0.85rem; margin: 0; }
 
+        @media (max-width: 900px) {
+            .page {
+                padding: 22px 18px 110px;
+            }
+
+            .bib-page {
+                padding-bottom: 110px;
+            }
+
+            .bib-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bib-header-left {
+                align-items: flex-start;
+            }
+
+            .bib-filters {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap;
+            }
+
+            .bib-filter-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .bib-category-header {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .bib-item {
+                grid-template-columns: auto 1fr;
+                align-items: start;
+            }
+
+            .bib-item-day-tag,
+            .bib-item-actions {
+                grid-column: 2;
+            }
+
+            .dash-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
         /* Responsive sidebar collapse */
         @media (max-width: 640px) {
-            .sidebar { width: 58px; padding: 20px 8px; }
-            .sidebar-logo-text, .sidebar-logo-sub,
+            body {
+                display: block;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                position: fixed;
+                inset: auto 0 0 0;
+                width: 100%;
+                height: auto;
+                padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                border-right: none;
+                border-top: 1px solid rgba(255,255,255,0.08);
+                z-index: 20;
+                gap: 8px;
+            }
+
+            body.light .sidebar {
+                border-top-color: #dce3ec;
+            }
+
+            .sidebar-logo,
+            .sidebar-spacer {
+                display: none;
+            }
+
+            .sidebar-bottom {
+                display: contents;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .nav-item {
+                flex: 1;
+                justify-content: center;
+                padding: 12px 10px;
+                min-width: 0;
+            }
+
             .nav-item span:not(.nav-item-icon),
-            .nav-item-badge { display: none; }
-            .nav-item { justify-content: center; padding: 10px; }
-            .sidebar-logo { justify-content: center; padding-bottom: 14px; }
+            .nav-item-badge {
+                display: none;
+            }
+
+            .main-area {
+                padding: 0;
+                overflow: visible;
+            }
+
+            .page {
+                padding: 18px 14px 92px;
+            }
+
+            .container {
+                padding: 0 0 92px;
+            }
+
+            .header {
+                align-items: stretch;
+            }
+
+            .actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .actions button {
+                width: 100%;
+            }
+
+            .dash-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .month-bars-wrap,
+            .heatmap-wrap,
+            .dash-stat {
+                padding: 16px;
+            }
+
+            .bib-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .bib-add-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .bib-items-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
 

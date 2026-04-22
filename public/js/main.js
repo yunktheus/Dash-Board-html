@@ -5,6 +5,7 @@ import { renderResources } from './resources.js';
 import { initBiblioteca, renderBiblioteca, updateBibBadge } from './biblioteca.js';
 import { initDashboard, renderDashboard } from './dashboard.js';
 import { initNavigation } from './navigation.js';
+import { initTimerSystem } from './timer.js';
 
 function exportData() {
     const customTitle = document.getElementById('editableTitle').value;
@@ -79,12 +80,21 @@ function setupEditableTitle() {
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
 }
 
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     modal.init();
+    registerServiceWorker();
     initTheme();
     loadSavedTitle();
     setupEditableTitle();
     loadFromLocal();
+    initTimerSystem();
     renderWeek();
     renderResources();
     initBiblioteca();

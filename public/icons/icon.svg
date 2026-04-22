@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="PomoDash">
+  <rect width="192" height="192" rx="40" fill="#0b1220"/>
+  <path d="M36 48h-12v84c0 6.6 5.4 12 12 12h84v-12H36V48zm96-24H60c-6.6 0-12 5.4-12 12v72c0 6.6 5.4 12 12 12h72c6.6 0 12-5.4 12-12V36c0-6.6-5.4-12-12-12zm-18 54H96v18H78V78H60V60h18V42h18v18h18v18z" fill="#e10600"/>
+</svg>

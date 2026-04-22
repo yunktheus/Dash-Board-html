@@ -1,7 +1,7 @@
 import { daysOrder, dayNames, escapeHtml } from './utils.js';
 import { modal } from './modal.js';
 import { tasksData, notes, saveAll } from './storage.js';
-import { handleTimerClick, timersState, syncTimerButton } from './timer.js';
+import { handleTimerClick, setActiveTimerDay, syncTimerButton } from './timer.js';
 
 export function renderWeek() {
     const grid = document.getElementById('weekGrid');
@@ -96,6 +96,7 @@ export function renderWeek() {
         // Timer
         syncTimerButton(day);
         card.querySelector('.timer-btn').addEventListener('click', () => handleTimerClick(day));
+        card.querySelector('.timer-btn').addEventListener('focus', () => setActiveTimerDay(day));
 
         // Notas
         renderNotesList(day);

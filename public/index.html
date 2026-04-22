@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>PomoDash</title>
+    <meta name="theme-color" content="#e10600">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e10600'%3E%3Cpath d='M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -102,6 +107,7 @@
             <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                 <div class="progress-fill" id="progressFill">0%</div>
             </div>
+            <div class="shortcut-hint">Atalhos: <kbd>Espaço</kbd> pausa/retoma o timer ativo · <kbd>Esc</kbd> interrompe</div>
             <div class="week-scroll">
                 <div class="week-grid" id="weekGrid"></div>
             </div>
