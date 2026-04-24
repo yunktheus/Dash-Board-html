@@ -76,9 +76,8 @@ git clone <seu-repositorio>
 ```
 
 2. Pode ser acessado pelo link:
-https://dash-board-html.vercel.app/
 
-```
+https://dash-board-html.vercel.app/
 
 3. Pronto! O sistema funciona direto no navegador.
 
