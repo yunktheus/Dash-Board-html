@@ -1,7 +1,7 @@
 [README.md](https://github.com/user-attachments/files/26979414/README.md)
-# 🏎️ Dashboard de Estudos
+# Dashboard de Estudos
 
-Um dashboard interativo inspirado em Fórmula 1 para organizar estudos de **Programação e Marketing**.
+Um dashboard interativo para organizar rotina de estudos.
 
 O projeto combina produtividade, organização e foco com uma experiência visual moderna, incluindo sistema de tarefas, timer estilo Pomodoro e biblioteca de materiais.
 
