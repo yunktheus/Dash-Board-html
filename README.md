@@ -75,10 +75,9 @@ O projeto combina produtividade, organização e foco com uma experiência visua
 git clone <seu-repositorio>
 ```
 
-2. Abra o arquivo:
+2. Pode ser acessado pelo link:
+https://dash-board-html.vercel.app/
 
-```bash id="q9x2lp"
-index.html
 ```
 
 3. Pronto! O sistema funciona direto no navegador.
