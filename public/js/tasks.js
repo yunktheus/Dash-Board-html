@@ -164,7 +164,10 @@ export function updateProgress() {
     const fill = document.getElementById('progressFill');
     if (fill) {
         fill.style.width = `${percent}%`;
-        fill.textContent = `${percent}%`;
-        fill.closest('[role="progressbar"]')?.setAttribute('aria-valuenow', percent);
+        const container = fill.closest('[role="progressbar"]');
+        if (container) {
+            container.setAttribute('aria-valuenow', percent);
+            container.setAttribute('data-pct', `${percent}%`);
+        }
     }
 }
