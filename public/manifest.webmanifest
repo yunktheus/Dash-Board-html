@@ -1,18 +1,29 @@
 {
-  "name": "PomoDash",
-  "short_name": "PomoDash",
-  "description": "Dashboard de estudos com tarefas, timer e biblioteca de materiais.",
-  "start_url": "./",
+  "name": "Studium — Seu espaço de estudos",
+  "short_name": "Studium",
+  "description": "Dashboard de estudos com Pomodoro, tarefas semanais e biblioteca.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#e10600",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "lang": "pt-BR",
+  "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "icons/icon.svg",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }

@@ -1,132 +1,36 @@
-[README.md](https://github.com/user-attachments/files/26979414/README.md)
-# Dashboard de Estudos
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Um dashboard interativo para organizar rotina de estudos.
+## Getting Started
 
-O projeto combina produtividade, organização e foco com uma experiência visual moderna, incluindo sistema de tarefas, timer estilo Pomodoro e biblioteca de materiais.
+First, run the development server:
 
----
-
-## 🚀 Funcionalidades
-
-### 📚 Sala de Aulas
-
-* Organização de tarefas por dia da semana
-* Sistema de checklist (concluir tarefas)
-* Barra de progresso automática
-* Edição de tarefas em tempo real
-* Sistema de anotações por dia
-
-### ⏱️ Timer Inteligente
-
-* Presets: 5, 10, 15, 25, 45 e 60 minutos
-* Timer personalizado
-* Pausar e retomar
-* Feedback sonoro estilo rádio F1
-
-### 📂 Biblioteca
-
-* Armazenamento de:
-
-  * Links
-  * PDFs
-  * Documentos
-  * Anotações
-* Organização por categorias
-* Filtro por dias da semana
-* Sistema de tags
-
-### 💾 Persistência de Dados
-
-* Salvamento automático com `localStorage`
-* Exportação de dados em `.json`
-* Importação de dados
-
-### 🎨 Interface
-
-* Tema claro e escuro
-* Design responsivo
-* Sidebar de navegação
-* Interface moderna com inspiração em dashboards
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-* HTML5
-* CSS3 (custom + responsividade)
-* JavaScript (Vanilla)
-* LocalStorage API
-* Web Audio API (som do timer)
-
----
-
-## 📸 Preview
-
-> Interface estilo dashboard com navegação lateral, cards de tarefas e sistema de biblioteca integrado.
-
----
-
-## 📦 Como usar
-
-1. Baixe ou clone o projeto:
-
-```bash id="a81jd2"
-git clone <seu-repositorio>
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-2. Pode ser acessado pelo link:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-https://dash-board-html.vercel.app/
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-3. Pronto! O sistema funciona direto no navegador.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
----
+## Learn More
 
-## 💡 Estrutura do Projeto
+To learn more about Next.js, take a look at the following resources:
 
-* Sidebar com navegação entre páginas:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-  * Menu Principal
-  * Sala de Aulas
-  * Biblioteca
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-* Componentes principais:
+## Deploy on Vercel
 
-  * Cards de dias da semana
-  * Sistema de tarefas
-  * Timer interativo
-  * Modal reutilizável
-  * Biblioteca de conteúdos
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
----
-
-## 🔥 Diferenciais
-
-* Interface inspirada em Fórmula 1 🏎️
-* Experiência fluida sem frameworks
-* Sistema completo em um único arquivo
-* Alta personalização
-* Ideal para estudantes autodidatas
-
----
-
-## 📈 Possíveis melhorias futuras
-
-* Sincronização com backend
-* Login de usuário
-* Versão mobile como app (PWA)
-* Integração com calendário
-* Estatísticas de produtividade
-
----
-
-## 👨‍💻 Autor
-
-Matheus Oliveira
-
----
-
-## 📄 Licença
-
-Este projeto é livre para uso e modificação.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
