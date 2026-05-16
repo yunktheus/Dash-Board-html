@@ -2,13 +2,9 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /users/{userId}/library/{allPaths=**} {
-      allow read, write: if request.auth != null
-                         && request.auth.uid == userId
-                         && (
-                           request.resource == null
-                           || request.resource.size < 20 * 1024 * 1024
-                         );
+    // Users can only read/write files in their own folder
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
