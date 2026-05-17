@@ -36,6 +36,7 @@ export interface LibraryFolder {
   id: string
   nome: string
   cor: string
+  dia: string
   criadoEm: string
 }
 

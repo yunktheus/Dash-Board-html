@@ -6,6 +6,7 @@ import {
   useContext,
   useReducer,
   useEffect,
+  useState,
   type ReactNode,
 } from 'react'
 import type {
@@ -31,17 +32,6 @@ import {
 // ─── State ────────────────────────────────────────────────────────────────────
 
 type State = AppData
-
-function getInitialState(): State {
-  if (typeof window === 'undefined') {
-    return defaultState()
-  }
-  try {
-    const saved = localStorage.getItem('studium_data')
-    if (saved) return JSON.parse(saved) as State
-  } catch {}
-  return defaultState()
-}
 
 function defaultState(): State {
   return {
@@ -72,7 +62,7 @@ type Action =
   | { type: 'DELETE_RESOURCE_ITEM'; categoryKey: string; itemId: string }
   | { type: 'ADD_BIBLIOTECA_ITEM'; item: Omit<LibraryItem, 'id' | 'addedAt'> }
   | { type: 'DELETE_BIBLIOTECA_ITEM'; itemId: string; storagePath?: string }
-  | { type: 'ADD_BIBLIOTECA_FOLDER'; nome: string; cor: string }
+  | { type: 'ADD_BIBLIOTECA_FOLDER'; nome: string; cor: string; dia: string }
   | { type: 'DELETE_BIBLIOTECA_FOLDER'; folderId: string }
   | { type: 'CHECK_IN' }
   | { type: 'IMPORT'; payload: Partial<State> }
@@ -209,6 +199,7 @@ function reducer(state: State, action: Action): State {
         id: generateId(),
         nome: action.nome,
         cor: action.cor,
+        dia: action.dia,
         criadoEm: new Date().toISOString(),
       }
       return {
@@ -254,13 +245,26 @@ interface StoreContextValue {
 const StoreContext = createContext<StoreContextValue>(null as unknown as StoreContextValue)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, getInitialState)
+  // Always start with defaultState so SSR and client first-render match
+  const [state, dispatch] = useReducer(reducer, undefined, defaultState)
+  const [isReady, setIsReady] = useState(false)
 
+  // Hydrate from localStorage after mount (client-only)
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem('studium_data')
+      if (saved) dispatch({ type: 'HYDRATE', payload: JSON.parse(saved) as State })
+    } catch {}
+    setIsReady(true)
+  }, [])
+
+  // Persist to localStorage only after hydration to avoid overwriting saved data
+  useEffect(() => {
+    if (!isReady) return
     try {
       localStorage.setItem('studium_data', JSON.stringify(state))
     } catch {}
-  }, [state])
+  }, [state, isReady])
 
   return createElement(StoreContext.Provider, { value: { state, dispatch } }, children)
 }
