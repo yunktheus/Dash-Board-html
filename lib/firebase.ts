@@ -44,7 +44,12 @@ export function getFirebaseAuth(): Auth | null {
 export function getFirebaseDb(): Firestore | null {
   const app = getFirebaseApp()
   if (!app) return null
-  if (!db) db = getFirestore(app)
+  if (!db) {
+    // Connect to a named Firestore database when one is configured;
+    // otherwise fall back to the default "(default)" database.
+    const databaseId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID
+    db = databaseId ? getFirestore(app, databaseId) : getFirestore(app)
+  }
   return db
 }
 

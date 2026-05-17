@@ -3,12 +3,21 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { StoreProvider } from '@/lib/store'
 import { Navbar } from '@/components/layout/navbar'
+import { LoginScreen } from '@/components/auth/login-screen'
 import { useAuth } from '@/hooks/use-auth'
 import { useSync } from '@/hooks/use-sync'
 import type { SyncStatus } from '@/types'
 
+function FullScreenLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
+      <span className="size-6 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
+    </div>
+  )
+}
+
 function AppShell({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading, configured, signIn } = useAuth()
   const { status } = useSync(user)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
@@ -24,6 +33,12 @@ function AppShell({ children }: { children: ReactNode }) {
   }, [theme])
 
   const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'))
+
+  // Auth state still resolving — avoid flashing the login screen
+  if (loading) return <FullScreenLoader />
+
+  // Login is mandatory when Firebase is configured
+  if (configured && !user) return <LoginScreen onSignIn={signIn} />
 
   return (
     <>
